@@ -1,0 +1,28 @@
+---
+#Ganglia setup
+- name: Install gmond
+  apt:
+      name: ganglia-monitor
+      state: latest
+      update_cache: yes
+  notify:
+    - Restart gmond
+
+- name: Configure gmond
+  template:
+      backup: yes
+      src: gmond_config
+      dest: /etc/ganglia/gmond.conf
+  notify:
+    - Restart gmond
+
+- name: UFW allow port
+  ufw:
+      port: "{{ ganglia_cluster_port_number }}"
+      rule: allow
+
+- name: Start gmond
+  service:
+      name: ganglia-monitor
+      state: started
+      enabled: yes

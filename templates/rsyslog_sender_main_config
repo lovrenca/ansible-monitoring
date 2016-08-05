@@ -1,0 +1,80 @@
+################################################################################
+#                                                                              #
+#                                 {o,o}                                        #
+#                                 |)__)                                        #
+#                                 -"-"-                                        #
+#                                                                              #
+################################################################################
+#
+#  /etc/rsyslog.conf    Configuration file for rsyslog.
+# This file was templated via ansible.
+# Do not edit manually  as chenges WILL be lost on next provision run.
+#
+###############################---MODULES---####################################
+
+$ModLoad imuxsock   # provides support for local system logging
+$ModLoad imklog     # provides kernel logging support
+$ModLoad imudp      # provides support for logging over tcp
+$ModLoad imtcp      # provides support for logging over tcp
+
+################################################################################
+
+############################---NETWORK SETTINGS---##############################
+
+$UDPServerRun 514
+$InputTCPServerRun 514
+$KLogPermitNonKernelFacility on
+
+################################################################################
+
+#############################---SECURE SETTINGS---##############################
+
+$DefaultNetstreamDriver gtls
+$DefaultNetstreamDriverCAFile {{ syslog_certs_path }}/{{ syslog_tls_ca }}
+$DefaultNetstreamDriverCertFile {{ syslog_certs_path }}/{{ syslog_tls_cert }}
+$DefaultNetstreamDriverKeyFile {{ syslog_certs_path }}/{{ syslog_tls_key }}
+{% if syslog_role == "collector" %}
+$InputTCPServerStreamDriverMode 1
+$InputTCPServerStreamDriverAuthMode x509/name
+$InputTCPServerRun {{ rsyslog_collector_port }}
+{% for sender in syslog_permited_senders %}
+$InputTCPServerStreamDriverPermittedPeer {{ sender }}
+{% endfor %}
+{% else %}
+$ActionSendStreamDriverMode 1
+$ActionSendStreamDriverAuthMode x509/name
+{% for peer in syslog_permited_peers %}
+$ActionSendStreamDriverPermittedPeer {{ peer }}
+{% endfor %}
+{% endif %}
+
+################################################################################
+
+###########################--- GLOBAL DIRECTIVES---#############################
+
+$ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat
+$RepeatedMsgReduction on
+$FileOwner syslog
+$FileGroup adm
+$FileCreateMode 0640
+$DirCreateMode 0755
+$Umask 0022
+$PrivDropToUser syslog
+$PrivDropToGroup adm
+$WorkDirectory /var/spool/rsyslog
+
+$MainMsgQueueSaveOnShutdown on
+$MainMsgQueueType LinkedList
+$MainMsgQueueFileName main_msg_q
+$MainMsgQueueSize {{ rsyslog_queue_size }}
+$MainMsgQueueHighWatermark {{ rsyslog_high_watermark }}
+$MainMsgQueueLowWatermark {{ rsyslog_low_watermark }}
+$MainMsgQueueDiscardMark {{ rsyslog_discard_watermark }}
+
+################################################################################
+
+##############################---INCLUDES---####################################
+
+$IncludeConfig /etc/rsyslog.d/*.conf
+
+################################################################################

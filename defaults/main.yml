@@ -1,0 +1,26 @@
+---
+#Default variables
+admin_mails:
+  - ""
+
+rsyslog_collector: ""
+rsyslog_collector_port: 10514
+syslog_certs_path: /opt/syslog
+syslog_tls_ca: "ca.crt"
+syslog_tls_cert: "syslog.crt"
+syslog_tls_key: "syslog.key"
+syslog_role: "sender"
+syslog_permited_peers:
+  - "example"
+syslog_permited_senders:
+  - "example"
+rsyslog_queue_size: 200000
+rsyslog_low_watermark: 10000
+rsyslog_high_watermark: 150000
+rsyslog_discard_watermark: 195000
+
+hive_role: sender
+ganglia_cluster_port_number: 8649
+ganglia_master_ip: ""
+ganglia_master_name: ""
+ganglia_cluster_name: ""

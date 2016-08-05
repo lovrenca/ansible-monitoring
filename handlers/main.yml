@@ -1,0 +1,9 @@
+---
+- name: Restart rsyslog
+  command: service rsyslog restart
+
+- name: Restart gmond
+  service:
+      name: ganglia-monitor
+      state: restarted
+      enabled: yes

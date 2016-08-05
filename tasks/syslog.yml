@@ -1,0 +1,69 @@
+---
+# Syslog tasks
+
+- name: Install gnu tls
+  apt:
+    name: rsyslog-gnutls
+    state: latest
+    force: yes
+
+- name: Create rsyslog certs directory
+  file:
+      path: "{{ syslog_certs_path }}"
+      state: directory
+      owner: syslog
+      group: adm
+      mode: 0750
+
+- name: Copy syslog_tls_ca
+  copy:
+      src: "{{ monitoring_syslog_ca_files }}/{{ syslog_tls_ca }}"
+      dest: "{{ syslog_certs_path }}/{{ syslog_tls_ca }}"
+      mode: 0640
+      owner: syslog
+      group: adm
+  notify: Restart rsyslog
+
+- name: Copy syslog_tls_key
+  copy:
+      src: "{{ monitoring_syslog_ca_files }}/{{ syslog_tls_key }}"
+      dest: "{{ syslog_certs_path }}/{{ syslog_tls_key }}"
+      mode: 0640
+      owner: syslog
+      group: adm
+  notify: Restart rsyslog
+
+- name: Copy syslog_tls_cert
+  copy:
+      src: "{{ monitoring_syslog_ca_files }}/{{ syslog_tls_cert }}"
+      dest: "{{ syslog_certs_path }}/{{ syslog_tls_cert }}"
+      mode: 0640
+      owner: syslog
+      group: adm
+  notify: Restart rsyslog
+
+- name: Configure rsyslog
+  template:
+      src: rsyslog_sender_main_config
+      dest: /etc/rsyslog.conf
+      mode: 0644
+      owner: root
+      group: root
+  notify: Restart rsyslog
+
+- name: Configure rsyslog sender policy
+  template:
+      src: rsyslog_forwarder_config
+      dest: /etc/rsyslog.d/42-forward.conf
+      mode: 0644
+      owner: root
+      group: root
+  notify: Restart rsyslog
+  when: syslog_role == "sender"
+
+- name: allow UDP logs from docker
+  ufw:
+    port: 514
+    proto: udp
+    from_ip: 172.16.0.0/12
+    rule: allow

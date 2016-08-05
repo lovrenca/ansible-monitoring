@@ -1,0 +1,6 @@
+---
+#Default variables
+# Monitoring role tasks
+
+- include: ganglia.yml
+- include: syslog.yml
