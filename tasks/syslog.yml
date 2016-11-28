@@ -59,7 +59,6 @@
       owner: root
       group: root
   notify: Restart rsyslog
-  when: syslog_role == "sender"
 
 - name: allow UDP logs from docker
   ufw:

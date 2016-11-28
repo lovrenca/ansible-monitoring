@@ -1,6 +1,9 @@
 ---
 - name: Restart rsyslog
-  command: service rsyslog restart
+  service:
+    name: rsyslog
+    state: restarted
+    enabled: yes
 
 - name: Restart gmond
   service:

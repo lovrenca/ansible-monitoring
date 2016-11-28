@@ -6,4 +6,8 @@ $ActionResumeRetryCount -1
 $ActionQueueHighWatermark {{ rsyslog_high_watermark }}
 $ActionQueueLowWatermark {{ rsyslog_low_watermark }}
 $ActionQueueDiscardMark {{ rsyslog_discard_watermark }}
+{% if syslog_role == "collector" %}
+*.* @@127.0.0.1:{{ rsyslog_logstash_port }}
+{% else %}
 *.* @@{{ rsyslog_collector }}:{{ rsyslog_collector_port }}
+{% endif %}
