@@ -1,0 +1,2 @@
+# Restarts ganglia daily
+1 1 * * 0 root systemctl rsyslog restart >> /dev/null

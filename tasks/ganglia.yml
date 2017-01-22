@@ -21,6 +21,11 @@
       port: "{{ ganglia_cluster_port_number }}"
       rule: allow
 
+- name: Create ganglia cronjob
+  copy:
+    src: ganglia-cronjob
+    dest: /etc/cron.d/ganglia
+
 - name: Start gmond
   service:
       name: ganglia-monitor

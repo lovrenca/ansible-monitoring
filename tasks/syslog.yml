@@ -73,3 +73,8 @@
     proto: tcp
     rule: allow
   when: syslog_role == "collector"
+
+- name: Create rsyslog cronjob
+  copy:
+    src: syslog-cronjob
+    dest: /etc/cron.d/rsyslog
