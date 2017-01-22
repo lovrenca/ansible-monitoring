@@ -1,2 +1,0 @@
-# Restarts ganglia daily
-1 1 * * * root /systemctl ganglia-monitor restart >> /dev/null
